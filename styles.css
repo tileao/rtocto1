@@ -466,3 +466,265 @@ canvas { width:100%; height:auto; display:block; background:#0b1017; }
     border-radius: 14px;
   }
 }
+
+
+/* v27 iPad portrait layout: first fold preserved, page scroll re-enabled */
+@media (min-width: 744px) and (max-width: 1100px) and (orientation: portrait) {
+  html, body {
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  body {
+    padding: 0;
+  }
+
+  .app-shell {
+    max-width: none;
+    width: 100vw;
+    min-height: 100dvh;
+    height: auto;
+    box-sizing: border-box;
+    padding: max(8px, env(safe-area-inset-top, 0px)) 10px max(14px, env(safe-area-inset-bottom, 0px)) 10px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(250px, 0.8fr);
+    grid-template-rows: auto auto auto auto;
+    grid-template-areas:
+      "hero hero"
+      "form status"
+      "chart chart"
+      "interp interp";
+    gap: 8px;
+    align-content: start;
+    overflow: visible;
+  }
+
+  #heroHeader,
+  #formSection,
+  #statusCard,
+  #visualCard,
+  #interpSection {
+    margin: 0;
+    border-radius: 18px;
+  }
+
+  #heroHeader {
+    grid-area: hero;
+    padding: 10px 14px;
+    min-height: 0;
+  }
+
+  #formSection {
+    grid-area: form;
+    padding: 10px 12px;
+    min-height: 0;
+  }
+
+  #statusCard {
+    grid-area: status;
+    position: static;
+    top: auto;
+    padding: 10px 12px;
+    min-height: 0;
+    align-self: stretch;
+  }
+
+  #visualCard {
+    grid-area: chart;
+    padding: 10px 12px;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+  }
+
+  #interpSection {
+    grid-area: interp;
+    padding: 8px 12px;
+    min-height: 0;
+  }
+
+  h1 {
+    font-size: 24px;
+    line-height: 1.05;
+  }
+
+  .eyebrow {
+    font-size: 10px;
+    margin-bottom: 2px;
+  }
+
+  .build-version {
+    margin-top: 3px;
+    font-size: 10px;
+  }
+
+  .card-title-row {
+    margin-bottom: 8px;
+    gap: 8px;
+  }
+
+  .pill {
+    padding: 4px 8px;
+    font-size: 10px;
+  }
+
+  .compact-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 10px;
+    align-items: end;
+  }
+
+  .select-block,
+  .compact-field,
+  .narrow-field,
+  .field-half {
+    grid-column: span 1;
+  }
+
+  label span,
+  .label {
+    margin-bottom: 4px;
+    font-size: 11px;
+  }
+
+  input, select {
+    min-height: 42px;
+    padding: 9px 10px;
+    font-size: 15px;
+    border-radius: 12px;
+  }
+
+  button {
+    border-radius: 12px;
+  }
+
+  .input-with-toggle {
+    grid-template-columns: 42px 1fr;
+    gap: 8px;
+  }
+
+  .sign-toggle {
+    min-height: 42px;
+    font-size: 16px;
+  }
+
+  .action-row {
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .action-row .primary,
+  .action-row .ghost {
+    min-height: 42px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  #formHint {
+    display: none;
+  }
+
+  .status-grid {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "summary"
+      "final";
+    gap: 8px;
+  }
+
+  .status-badge {
+    padding: 6px 9px;
+    font-size: 10px;
+  }
+
+  .status-kicker {
+    margin: 8px 0 2px;
+  }
+
+  .status-summary h2 {
+    font-size: 17px;
+  }
+
+  .status-text {
+    font-size: 12px;
+    margin-top: 2px;
+  }
+
+  .status-detail {
+    font-size: 11px;
+    margin-top: 3px;
+    line-height: 1.3;
+  }
+
+  .result-main {
+    padding: 10px 12px;
+  }
+
+  .result-main strong {
+    font-size: 30px;
+  }
+
+  .compact-result-main {
+    min-height: 84px;
+  }
+
+  .toolbar-row {
+    gap: 8px;
+  }
+
+  #toggleChart {
+    display: none;
+  }
+
+  #chartPanel,
+  #chartPanel.hidden {
+    display: flex !important;
+    min-height: 0;
+    margin-top: 0;
+    flex-direction: column;
+  }
+
+  .chart-stage {
+    min-height: 260px;
+    height: 38vh;
+    max-height: 420px;
+    aspect-ratio: auto;
+  }
+
+  canvas {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .legend {
+    display: flex;
+    margin-top: 8px;
+    gap: 6px 12px;
+    font-size: 11px;
+  }
+
+  #chartHint,
+  #chartReference {
+    display: none;
+  }
+
+  #interpSection .card-title-row {
+    margin-bottom: 6px;
+  }
+
+  #interpSection h2 {
+    font-size: 15px;
+  }
+
+  .interp-box {
+    padding: 8px 10px;
+    font-size: 12px;
+    line-height: 1.25;
+    max-height: none;
+    overflow: visible;
+    border-radius: 14px;
+  }
+}
