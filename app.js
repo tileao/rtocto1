@@ -34,6 +34,14 @@ const state = {
   profileKey: 'standard',
 };
 
+const tabletLayoutQuery = window.matchMedia('(min-width: 768px) and (max-width: 1366px)');
+
+function applyAdaptiveLayout() {
+  const tabletDashboard = tabletLayoutQuery.matches;
+  document.body.classList.toggle('tablet-dashboard', tabletDashboard);
+  if (tabletDashboard) toggleChartVisibility(true);
+}
+
 const profiles = {
   standard: {
     label: 'Standard',
@@ -49,6 +57,11 @@ const profiles = {
     label: 'EAPS ON',
     json: 'data/figure_4_58_engine_data.json',
     image: 'docs/page_s50_93_figure_4_58.png',
+  },
+  ibfInstalled: {
+    label: 'IBF Installed',
+    json: 'data/figure_4_68a_engine_data.json',
+    image: 'docs/page_s50_108a_figure_4_68a.png',
   },
 };
 
@@ -718,7 +731,7 @@ function updateProfileTexts() {
   const src = state.engine?.source;
   if (!src) return;
   if (subtitleEl) subtitleEl.textContent = `Reject Take Off Distance — Supplement ${src.supplement} — Figure ${src.figure}`;
-  if (buildVersionEl) buildVersionEl.textContent = 'Build v21 • Inputs first + compact final result';
+  if (buildVersionEl) buildVersionEl.textContent = 'Build v24 • tablet layout optimized';
   const paRange = state.engine.panels.left.pressure_altitude_ft;
   const confLabel = src.configuration || profiles[state.profileKey]?.label || '—';
   const formHint = document.getElementById('formHint');
@@ -741,7 +754,7 @@ async function loadProfile(profileKey, { preserveInputs = true } = {}) {
 
   state.profileKey = profileKey;
   const [engine, image] = await Promise.all([
-    fetch(`${profile.json}?v=v21`).then((r) => {
+    fetch(`${profile.json}?v=v25`).then((r) => {
       if (!r.ok) throw new Error(`Falha ao carregar ${profile.json}`);
       return r.json();
     }),
@@ -749,7 +762,7 @@ async function loadProfile(profileKey, { preserveInputs = true } = {}) {
       const img = new Image();
       img.onload = () => resolve(img);
       img.onerror = () => reject(new Error(`Falha ao carregar ${profile.image}`));
-      img.src = `${profile.image}?v=v21`;
+      img.src = `${profile.image}?v=v25`;
     }),
   ]);
 
@@ -777,6 +790,9 @@ async function loadProfile(profileKey, { preserveInputs = true } = {}) {
 async function init() {
   setupAutoAdvance();
   updatePdfButtonLabel();
+  applyAdaptiveLayout();
+  if (typeof tabletLayoutQuery.addEventListener === 'function') tabletLayoutQuery.addEventListener('change', applyAdaptiveLayout);
+  else if (typeof tabletLayoutQuery.addListener === 'function') tabletLayoutQuery.addListener(applyAdaptiveLayout);
 
   paNegativeBtn.addEventListener('click', () => toggleSignedInput(paEl, 4));
   oatNegativeBtn.addEventListener('click', () => toggleSignedInput(oatEl, 2));
@@ -807,6 +823,7 @@ async function init() {
   }
 
   await loadProfile(configurationEl.value || 'standard', { preserveInputs: false });
+  applyAdaptiveLayout();
 }
 
 init().catch((error) => {

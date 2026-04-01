@@ -46,3 +46,6 @@ Build v16
 ## v18
 - Figure 4-58: painel central e painel direito religados à base aprovada de curvas.
 - Overlay das curvas usadas no cálculo passa a usar a mesma base aprovada.
+
+
+Build v23: IBF center panel scale corrected to 0–20 m full-width on Figure 4-68A.

@@ -137,3 +137,332 @@ canvas { width:100%; height:auto; display:block; background:#0b1017; }
   .compact-result-main { min-height: 0; }
   .action-row { gap:10px; }
 }
+
+
+@media (min-width: 768px) and (max-width: 1366px) {
+  body.tablet-dashboard { overflow: hidden; }
+  body.tablet-dashboard .app-shell {
+    max-width: none;
+    width: calc(100vw - 24px);
+    min-height: 100dvh;
+    padding: 10px 12px 12px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto auto minmax(220px, 1fr) auto;
+    grid-template-areas:
+      "hero"
+      "form"
+      "status"
+      "chart"
+      "interp";
+    gap: 10px;
+    align-content: stretch;
+  }
+
+  body.tablet-dashboard #heroHeader { grid-area: hero; margin-bottom: 0; padding: 12px 16px; }
+  body.tablet-dashboard #formSection { grid-area: form; margin-bottom: 0; padding: 14px; }
+  body.tablet-dashboard #statusCard {
+    grid-area: status;
+    margin-bottom: 0;
+    padding: 12px;
+    position: static;
+    top: auto;
+  }
+  body.tablet-dashboard #visualCard {
+    grid-area: chart;
+    margin-bottom: 0;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  body.tablet-dashboard #interpSection { grid-area: interp; margin-bottom: 0; padding: 12px; }
+
+  body.tablet-dashboard h1 { font-size: 28px; }
+  body.tablet-dashboard .eyebrow { margin-bottom: 2px; }
+  body.tablet-dashboard .build-version { margin-top: 4px; font-size: 11px; }
+  body.tablet-dashboard .card-title-row { margin-bottom: 10px; }
+
+  body.tablet-dashboard .compact-grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 10px;
+  }
+  body.tablet-dashboard .select-block { grid-column: span 6; }
+  body.tablet-dashboard .compact-field { grid-column: span 3; }
+  body.tablet-dashboard .narrow-field { grid-column: span 3; }
+  body.tablet-dashboard label span,
+  body.tablet-dashboard .label { margin-bottom: 6px; font-size: 12px; }
+  body.tablet-dashboard input,
+  body.tablet-dashboard select { min-height: 48px; padding: 12px 12px; }
+  body.tablet-dashboard .sign-toggle { min-height: 48px; }
+  body.tablet-dashboard .action-row { margin-top: 12px; }
+  body.tablet-dashboard #formHint { display: none; }
+
+  body.tablet-dashboard .status-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(220px, .92fr);
+    gap: 8px;
+  }
+  body.tablet-dashboard .status-summary h2 { font-size: 18px; }
+  body.tablet-dashboard .status-text { font-size: 12px; }
+  body.tablet-dashboard .status-detail { font-size: 11px; }
+  body.tablet-dashboard .result-main strong { font-size: 26px; }
+  body.tablet-dashboard .compact-result-main { min-height: 96px; }
+
+  body.tablet-dashboard #chartPanel.hidden { display: flex !important; }
+  body.tablet-dashboard #chartPanel {
+    margin-top: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  body.tablet-dashboard .chart-stage {
+    flex: 1;
+    min-height: 0;
+    aspect-ratio: 842 / 595;
+  }
+  body.tablet-dashboard canvas { width: 100%; height: 100%; }
+  body.tablet-dashboard .toolbar-row { gap: 8px; }
+  body.tablet-dashboard .small { padding: 8px 10px; font-size: 13px; }
+  body.tablet-dashboard .legend { margin-top: 8px; gap: 6px 12px; font-size: 11px; }
+  body.tablet-dashboard #chartHint,
+  body.tablet-dashboard #chartReference { display: none; }
+  body.tablet-dashboard .interp-box {
+    padding: 10px 12px;
+    font-size: 13px;
+    max-height: 86px;
+    overflow: auto;
+  }
+}
+
+@media (min-width: 900px) and (max-width: 1366px) {
+  body.tablet-dashboard .app-shell {
+    grid-template-columns: minmax(0, 1.15fr) minmax(300px, .85fr);
+    grid-template-rows: auto auto minmax(240px, 1fr) auto;
+    grid-template-areas:
+      "hero hero"
+      "form status"
+      "chart chart"
+      "interp interp";
+  }
+
+  body.tablet-dashboard #statusCard { align-self: stretch; }
+}
+
+
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
+  body.tablet-dashboard {
+    overflow: hidden;
+  }
+
+  body.tablet-dashboard .app-shell {
+    max-width: none;
+    width: 100vw;
+    height: 100dvh;
+    padding: 8px 10px 10px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.28fr) minmax(240px, .88fr);
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "hero hero"
+      "form status"
+      "chart chart"
+      "interp interp";
+    gap: 8px;
+    align-content: stretch;
+  }
+
+  body.tablet-dashboard #heroHeader {
+    grid-area: hero;
+    margin-bottom: 0;
+    padding: 10px 14px;
+    border-radius: 18px;
+  }
+
+  body.tablet-dashboard #formSection,
+  body.tablet-dashboard #statusCard,
+  body.tablet-dashboard #visualCard,
+  body.tablet-dashboard #interpSection {
+    margin-bottom: 0;
+    padding: 10px 12px;
+    border-radius: 18px;
+  }
+
+  body.tablet-dashboard #formSection { grid-area: form; }
+  body.tablet-dashboard #statusCard {
+    grid-area: status;
+    position: static;
+    top: auto;
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  body.tablet-dashboard #visualCard {
+    grid-area: chart;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  body.tablet-dashboard #interpSection {
+    grid-area: interp;
+    min-height: 0;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  body.tablet-dashboard h1 {
+    font-size: 24px;
+    line-height: 1;
+  }
+  body.tablet-dashboard .eyebrow {
+    font-size: 10px;
+    margin-bottom: 2px;
+  }
+  body.tablet-dashboard .build-version {
+    margin-top: 3px;
+    font-size: 10px;
+  }
+
+  body.tablet-dashboard .card-title-row {
+    margin-bottom: 8px;
+    gap: 8px;
+  }
+  body.tablet-dashboard .pill {
+    padding: 4px 8px;
+    font-size: 10px;
+  }
+
+  body.tablet-dashboard .compact-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 10px;
+    align-items: end;
+  }
+  body.tablet-dashboard .select-block,
+  body.tablet-dashboard .compact-field,
+  body.tablet-dashboard .narrow-field,
+  body.tablet-dashboard .field-half {
+    grid-column: span 1;
+  }
+  body.tablet-dashboard label span,
+  body.tablet-dashboard .label {
+    margin-bottom: 4px;
+    font-size: 11px;
+  }
+  body.tablet-dashboard input,
+  body.tablet-dashboard select,
+  body.tablet-dashboard button {
+    border-radius: 12px;
+  }
+  body.tablet-dashboard input,
+  body.tablet-dashboard select {
+    min-height: 42px;
+    padding: 9px 10px;
+    font-size: 15px;
+  }
+  body.tablet-dashboard .input-with-toggle {
+    grid-template-columns: 42px 1fr;
+    gap: 8px;
+  }
+  body.tablet-dashboard .sign-toggle {
+    min-height: 42px;
+    font-size: 16px;
+  }
+  body.tablet-dashboard .action-row {
+    gap: 8px;
+    margin-top: 10px;
+  }
+  body.tablet-dashboard .action-row .primary,
+  body.tablet-dashboard .action-row .ghost {
+    min-height: 42px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+  body.tablet-dashboard #formHint {
+    display: none;
+  }
+
+  body.tablet-dashboard .status-grid {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "summary"
+      "final";
+    gap: 8px;
+  }
+  body.tablet-dashboard .status-badge {
+    padding: 6px 9px;
+    font-size: 10px;
+  }
+  body.tablet-dashboard .status-kicker {
+    margin: 8px 0 2px;
+  }
+  body.tablet-dashboard .status-summary h2 {
+    font-size: 17px;
+  }
+  body.tablet-dashboard .status-text {
+    font-size: 12px;
+    margin-top: 2px;
+  }
+  body.tablet-dashboard .status-detail {
+    font-size: 11px;
+    margin-top: 3px;
+    line-height: 1.35;
+  }
+  body.tablet-dashboard .result-main {
+    padding: 10px 12px;
+  }
+  body.tablet-dashboard .result-main strong {
+    font-size: 32px;
+  }
+  body.tablet-dashboard .compact-result-main {
+    min-height: 88px;
+  }
+
+  body.tablet-dashboard .toolbar-row {
+    gap: 8px;
+  }
+  body.tablet-dashboard #toggleChart {
+    display: none;
+  }
+  body.tablet-dashboard #chartPanel.hidden {
+    display: flex !important;
+  }
+  body.tablet-dashboard #chartPanel {
+    margin-top: 0;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  body.tablet-dashboard .chart-stage {
+    flex: 1;
+    min-height: 0;
+    aspect-ratio: auto;
+  }
+  body.tablet-dashboard canvas {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  body.tablet-dashboard .legend,
+  body.tablet-dashboard #chartHint,
+  body.tablet-dashboard #chartReference {
+    display: none;
+  }
+
+  body.tablet-dashboard #interpSection .card-title-row {
+    margin-bottom: 6px;
+  }
+  body.tablet-dashboard #interpSection h2 {
+    font-size: 16px;
+  }
+  body.tablet-dashboard .interp-box {
+    padding: 8px 10px;
+    font-size: 12px;
+    line-height: 1.3;
+    max-height: 52px;
+    overflow: auto;
+    border-radius: 14px;
+  }
+}
