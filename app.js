@@ -19,10 +19,7 @@ const statusCard = document.getElementById('statusCard');
 const statusBadge = document.getElementById('statusBadge');
 const statusTitle = document.getElementById('statusTitle');
 const statusText = document.getElementById('statusText');
-const baseMetric = document.getElementById('baseMetric');
-const baseMetricFt = document.getElementById('baseMetricFt');
-const corrMetric = document.getElementById('corrMetric');
-const corrMetricFt = document.getElementById('corrMetricFt');
+const statusDetail = document.getElementById('statusDetail');
 const finalMetric = document.getElementById('finalMetric');
 const finalMetricFt = document.getElementById('finalMetricFt');
 const interpBox = document.getElementById('interpBox');
@@ -140,18 +137,15 @@ function parseUnsignedField(el) {
   return Number(raw);
 }
 
-function setStatus(kind, badge, title, text) {
-  statusCard.className = `card status ${kind}`;
+function setStatus(kind, badge, title, text, detail = '') {
+  statusCard.className = `card status sticky-result ${kind}`;
   statusBadge.textContent = badge;
   statusTitle.textContent = title;
   statusText.textContent = text;
+  if (statusDetail) statusDetail.textContent = detail;
 }
 
 function setMetricsEmpty() {
-  baseMetric.textContent = '—';
-  baseMetricFt.textContent = '—';
-  corrMetric.textContent = '—';
-  corrMetricFt.textContent = '—';
   finalMetric.textContent = '—';
   finalMetricFt.textContent = '—';
 }
@@ -608,10 +602,6 @@ function updatePdfButtonLabel() {
 
 function updateResultCards(result) {
   const o = result.outputs;
-  baseMetric.textContent = `${fmt(o.baseDistanceM, 0)} m`;
-  baseMetricFt.textContent = `${fmt(o.baseDistanceFt, 0)} ft`;
-  corrMetric.textContent = `${fmt(o.correctionPerKtM, 1)} m/kt`;
-  corrMetricFt.textContent = `${fmt(o.correctionPerKtFt, 1)} ft/kt`;
   finalMetric.textContent = `${fmt(o.finalDistanceM, 0)} m`;
   finalMetricFt.textContent = `${fmt(o.finalDistanceFt, 0)} ft`;
 }
@@ -619,7 +609,13 @@ function updateResultCards(result) {
 function showSuccess(result) {
   const o = result.outputs;
   const windText = `${fmt(result.inputs.headwindKt, 0)} kt headwind`;
-  setStatus('within', 'CÁLCULO OK', 'RTO calculada', `Base ${fmt(o.baseDistanceM, 0)} m e correção total ${fmt(o.totalCorrectionM, 0)} m com ${windText}.`);
+  setStatus(
+    'within',
+    'CÁLCULO OK',
+    'RTO calculada',
+    `Fator de correção: ${fmt(o.correctionPerKtM, 1)} m/kt × ${windText}.`,
+    `Base calculada ${fmt(o.baseDistanceM, 0)} m e correção total ${fmt(o.totalCorrectionM, 0)} m com ${windText}.`
+  );
   updateResultCards(result);
 
   const oatInterp = result.brackets.oatLow === result.brackets.oatHigh
@@ -649,9 +645,9 @@ function showError(message, kind = 'warn') {
   setMetricsEmpty();
   interpBox.textContent = 'Sem cálculo válido para os dados informados.';
   if (kind === 'warn') {
-    setStatus('warn', 'FORA DA FAIXA', 'Sem cálculo', message);
+    setStatus('warn', 'FORA DA FAIXA', 'Sem cálculo', message, '');
   } else {
-    setStatus('out', 'ERRO', 'Falha de engine', message);
+    setStatus('out', 'ERRO', 'Falha de engine', message, '');
   }
 }
 
@@ -697,7 +693,7 @@ function clearResultsOnly() {
   setMetricsEmpty();
   interpBox.textContent = 'Sem cálculo ainda.';
   const figure = state.engine?.source?.figure || '—';
-  setStatus('neutral', 'AGUARDANDO DADOS', `RTO Figure ${figure}`, 'Preencha os campos e execute o cálculo.');
+  setStatus('neutral', 'AGUARDANDO DADOS', `RTO Figure ${figure}`, 'Fator de correção: —', 'Preencha os campos e execute o cálculo.');
   drawOverlay(null);
 }
 
@@ -722,7 +718,7 @@ function updateProfileTexts() {
   const src = state.engine?.source;
   if (!src) return;
   if (subtitleEl) subtitleEl.textContent = `Reject Take Off Distance — Supplement ${src.supplement} — Figure ${src.figure}`;
-  if (buildVersionEl) buildVersionEl.textContent = 'Build v20 • Compact sticky result layout';
+  if (buildVersionEl) buildVersionEl.textContent = 'Build v21 • Inputs first + compact final result';
   const paRange = state.engine.panels.left.pressure_altitude_ft;
   const confLabel = src.configuration || profiles[state.profileKey]?.label || '—';
   const formHint = document.getElementById('formHint');
@@ -745,7 +741,7 @@ async function loadProfile(profileKey, { preserveInputs = true } = {}) {
 
   state.profileKey = profileKey;
   const [engine, image] = await Promise.all([
-    fetch(`${profile.json}?v=v16`).then((r) => {
+    fetch(`${profile.json}?v=v21`).then((r) => {
       if (!r.ok) throw new Error(`Falha ao carregar ${profile.json}`);
       return r.json();
     }),
@@ -753,7 +749,7 @@ async function loadProfile(profileKey, { preserveInputs = true } = {}) {
       const img = new Image();
       img.onload = () => resolve(img);
       img.onerror = () => reject(new Error(`Falha ao carregar ${profile.image}`));
-      img.src = `${profile.image}?v=v16`;
+      img.src = `${profile.image}?v=v21`;
     }),
   ]);
 

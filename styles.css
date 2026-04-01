@@ -72,13 +72,12 @@ button { cursor:pointer; }
 }
 .status-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(0, .95fr) minmax(0, .95fr);
-  grid-template-areas:
-    "summary final final"
-    "summary base corr";
+  grid-template-columns: minmax(0, 1.25fr) minmax(250px, .95fr);
+  grid-template-areas: "summary final";
   gap: 10px;
   align-items: stretch;
 }
+.compact-status-grid { align-items: stretch; }
 .status-summary {
   grid-area: summary;
   min-width: 0;
@@ -89,14 +88,14 @@ button { cursor:pointer; }
 .status-kicker { margin: 10px 0 4px; }
 .status-badge { display:inline-flex; width:max-content; padding:7px 11px; border-radius:999px; font-size:11px; font-weight:700; letter-spacing:.08em; background:#203043; }
 .status-summary h2 { font-size: 21px; margin: 0; }
-.status-text { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+.status-text { margin: 4px 0 0; color: var(--text); font-size: 13px; }
+.status-detail { margin: 4px 0 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
 .metric { background: rgba(11,15,20,.55); border:1px solid var(--line); border-radius:16px; padding:10px 12px; }
 .metric strong { font-size:22px; display:block; line-height:1.05; }
 .metric small { color:var(--muted); display:block; margin-top:2px; }
-.result-main { grid-area: final; padding: 12px 14px; }
-.result-main strong { font-size: 32px; }
-.compact-metric { min-height: 0; }
-.reference-metric { opacity: .92; }
+.result-main { grid-area: final; padding: 12px 14px; display: flex; flex-direction: column; justify-content: center; }
+.result-main strong { font-size: 30px; }
+.compact-result-main { min-height: 108px; }
 .emphasis-metric { border-color: rgba(82,168,255,.45); background: rgba(82,168,255,.08); }
 .status.within { background: linear-gradient(180deg, rgba(20,184,106,.18), rgba(18,25,34,.94)); border-color: rgba(20,184,106,.5); }
 .status.within .status-badge { background: rgba(20,184,106,.22); color:#8ff0be; }
@@ -127,14 +126,14 @@ canvas { width:100%; height:auto; display:block; background:#0b1017; }
   .field-half { grid-column: span 1; }
   .control-block { grid-column: 1 / -1; }
   .status-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     grid-template-areas:
-      "summary summary"
-      "final final"
-      "base corr";
+      "summary"
+      "final";
   }
   .sticky-result { top: calc(env(safe-area-inset-top, 0px) + 6px); }
   .status-summary h2 { font-size: 19px; }
   .result-main strong { font-size: 28px; }
+  .compact-result-main { min-height: 0; }
   .action-row { gap:10px; }
 }

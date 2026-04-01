@@ -15,38 +15,9 @@
         <p class="eyebrow">AW139 Companion App</p>
         <h1>RTO / CTO Module</h1>
         <p id="subtitleEl" class="subtitle visually-hidden">Reject Take Off Distance — Supplement 50 — Figure 4-54</p>
-        <p id="buildVersionEl" class="build-version">Build v20 • Compact sticky result layout</p>
+        <p id="buildVersionEl" class="build-version">Build v21 • Inputs first + compact final result</p>
       </div>
     </header>
-
-    <section id="statusCard" class="card status sticky-result neutral">
-      <div class="status-grid">
-        <div class="status-summary">
-          <div id="statusBadge" class="status-badge">AGUARDANDO DADOS</div>
-          <p class="label status-kicker">Resultado principal</p>
-          <h2 id="statusTitle">RTO Figure 4-54</h2>
-          <p id="statusText" class="status-text">Preencha os campos e execute o cálculo.</p>
-        </div>
-
-        <div class="metric emphasis-metric result-main">
-          <span class="label">RTO final</span>
-          <strong id="finalMetric">—</strong>
-          <small id="finalMetricFt">—</small>
-        </div>
-
-        <div class="metric compact-metric">
-          <span class="label">RTO base</span>
-          <strong id="baseMetric">—</strong>
-          <small id="baseMetricFt">—</small>
-        </div>
-
-        <div class="metric compact-metric reference-metric">
-          <span class="label">Correção / kt</span>
-          <strong id="corrMetric">—</strong>
-          <small id="corrMetricFt">—</small>
-        </div>
-      </div>
-    </section>
 
     <section class="card form-card">
       <div class="card-title-row">
@@ -109,6 +80,24 @@
       <p id="formHint" class="hint">Escopo atual: Supplement 50, RTO Clear Area. Selecione o perfil.</p>
     </section>
 
+    <section id="statusCard" class="card status sticky-result neutral">
+      <div class="status-grid compact-status-grid">
+        <div class="status-summary">
+          <div id="statusBadge" class="status-badge">AGUARDANDO DADOS</div>
+          <p class="label status-kicker">Resultado</p>
+          <h2 id="statusTitle">RTO Figure 4-54</h2>
+          <p id="statusText" class="status-text">Fator de correção: —</p>
+          <p id="statusDetail" class="status-detail">Preencha os campos e execute o cálculo.</p>
+        </div>
+
+        <div class="metric emphasis-metric result-main compact-result-main">
+          <span class="label">RTO final</span>
+          <strong id="finalMetric">—</strong>
+          <small id="finalMetricFt">—</small>
+        </div>
+      </div>
+    </section>
+
     <section class="card">
       <div class="card-title-row">
         <h2>Visualização</h2>
@@ -140,6 +129,6 @@
     </section>
   </main>
 
-  <script src="app.js?v=rto-engine-v20"></script>
+  <script src="app.js?v=rto-engine-v21"></script>
 </body>
 </html>
