@@ -4,50 +4,46 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0b0f14">
-  <title>AW139 RTO / CTO — RTO Sup 50 Profiles</title>
+  <title>AW139 Companion App — RTO / CTO Module</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <main class="app-shell">
-    <header class="hero">
+    <header class="hero hero-compact">
       <div>
         <p class="eyebrow">AW139 Companion App</p>
         <h1>RTO / CTO Module</h1>
-        <p id="buildVersionEl" class="build-version">Build v19</p>
+        <p id="subtitleEl" class="subtitle visually-hidden">Reject Take Off Distance — Supplement 50 — Figure 4-54</p>
+        <p id="buildVersionEl" class="build-version">Build v20 • Compact sticky result layout</p>
       </div>
     </header>
 
-    <section id="statusCard" class="card status result-card neutral">
-      <div class="result-header-row">
-        <div id="statusBadge" class="status-badge">AGUARDANDO DADOS</div>
-      </div>
-
-      <div class="result-focus">
-        <span class="label result-label">RTO final</span>
-        <strong id="finalMetric" class="result-big">—</strong>
-        <small id="finalMetricFt" class="result-big-sub">—</small>
-      </div>
-
-      <div class="status-summary">
-        <div class="status-copy">
-          <p class="label">Status</p>
+    <section id="statusCard" class="card status sticky-result neutral">
+      <div class="status-grid">
+        <div class="status-summary">
+          <div id="statusBadge" class="status-badge">AGUARDANDO DADOS</div>
+          <p class="label status-kicker">Resultado principal</p>
           <h2 id="statusTitle">RTO Figure 4-54</h2>
-          <p id="statusText">Preencha os campos e execute o cálculo.</p>
+          <p id="statusText" class="status-text">Preencha os campos e execute o cálculo.</p>
         </div>
 
-        <div class="metrics metrics-secondary">
-          <div class="metric secondary-metric">
-            <span class="label">RTO base</span>
-            <strong id="baseMetric">—</strong>
-            <small id="baseMetricFt">—</small>
-          </div>
-          <div class="metric secondary-metric reference-metric">
-            <span class="label">Correção / kt</span>
-            <strong id="corrMetric">—</strong>
-            <small id="corrMetricFt">—</small>
-            <span class="metric-note">Referência</span>
-          </div>
+        <div class="metric emphasis-metric result-main">
+          <span class="label">RTO final</span>
+          <strong id="finalMetric">—</strong>
+          <small id="finalMetricFt">—</small>
+        </div>
+
+        <div class="metric compact-metric">
+          <span class="label">RTO base</span>
+          <strong id="baseMetric">—</strong>
+          <small id="baseMetricFt">—</small>
+        </div>
+
+        <div class="metric compact-metric reference-metric">
+          <span class="label">Correção / kt</span>
+          <strong id="corrMetric">—</strong>
+          <small id="corrMetricFt">—</small>
         </div>
       </div>
     </section>
@@ -113,7 +109,7 @@
       <p id="formHint" class="hint">Escopo atual: Supplement 50, RTO Clear Area. Selecione o perfil.</p>
     </section>
 
-    <section class="card visual-card">
+    <section class="card">
       <div class="card-title-row">
         <h2>Visualização</h2>
         <div class="toolbar-row">
@@ -129,14 +125,14 @@
           <span><i class="dot amber"></i> PA / curvas OAT usadas</span>
           <span><i class="dot cyan"></i> Transferência</span>
           <span><i class="dot green"></i> curvas de peso usadas</span>
-          <span><i class="dot magenta"></i> Correção / linha de referência</span>
+          <span><i class="dot magenta"></i> Correction / Reference line</span>
         </div>
         <p id="chartHint" class="hint">Overlay direto sobre a página completa do RFM: altitude, curvas usadas no cálculo, transferência horizontal, leitura da distância e correção por headwind.</p>
         <p id="chartReference" class="chart-reference"><strong>Gráfico em uso:</strong> Figure 4-54 — Rejected Take Off Distance OEI Clear Area.<br><strong>Suplemento:</strong> Supplement 50<br><strong>Página:</strong> S50-85<br><strong>Fonte:</strong> Leonardo AW139 Rotorcraft Flight Manual (RFM), Ed. 2, Rev. 32.</p>
       </div>
     </section>
 
-    <section class="card compact interp-card">
+    <section class="card compact">
       <div class="card-title-row">
         <h2>Interpolação aplicada</h2>
       </div>
@@ -144,6 +140,6 @@
     </section>
   </main>
 
-  <script src="app.js?v=rto-engine-v19"></script>
+  <script src="app.js?v=rto-engine-v20"></script>
 </body>
 </html>

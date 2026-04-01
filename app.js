@@ -6,11 +6,13 @@ const paNegativeBtn = document.getElementById('paNegativeBtn');
 const oatNegativeBtn = document.getElementById('oatNegativeBtn');
 const configurationEl = document.getElementById('configuration');
 const runBtn = document.getElementById('runBtn');
+const demoBtn = document.getElementById('demoBtn');
 const resetBtn = document.getElementById('resetBtn');
 const toggleChartBtn = document.getElementById('toggleChart');
 const exportPdfBtn = document.getElementById('exportPdfBtn');
 const chartPanel = document.getElementById('chartPanel');
 const chartCanvas = document.getElementById('chartCanvas');
+const subtitleEl = document.getElementById('subtitleEl');
 const buildVersionEl = document.getElementById('buildVersionEl');
 
 const statusCard = document.getElementById('statusCard');
@@ -682,6 +684,13 @@ function runCalculation() {
   }
 }
 
+function loadDemo() {
+  paEl.value = '0';
+  oatEl.value = '25';
+  weightEl.value = '6700';
+  windEl.value = '5';
+  runCalculation();
+}
 
 function clearResultsOnly() {
   state.currentResult = null;
@@ -712,7 +721,8 @@ function toggleChartVisibility(forceShow = null) {
 function updateProfileTexts() {
   const src = state.engine?.source;
   if (!src) return;
-  buildVersionEl.textContent = 'Build v19';
+  if (subtitleEl) subtitleEl.textContent = `Reject Take Off Distance — Supplement ${src.supplement} — Figure ${src.figure}`;
+  if (buildVersionEl) buildVersionEl.textContent = 'Build v20 • Compact sticky result layout';
   const paRange = state.engine.panels.left.pressure_altitude_ft;
   const confLabel = src.configuration || profiles[state.profileKey]?.label || '—';
   const formHint = document.getElementById('formHint');
@@ -735,7 +745,7 @@ async function loadProfile(profileKey, { preserveInputs = true } = {}) {
 
   state.profileKey = profileKey;
   const [engine, image] = await Promise.all([
-    fetch(`${profile.json}?v=v19`).then((r) => {
+    fetch(`${profile.json}?v=v16`).then((r) => {
       if (!r.ok) throw new Error(`Falha ao carregar ${profile.json}`);
       return r.json();
     }),
@@ -743,7 +753,7 @@ async function loadProfile(profileKey, { preserveInputs = true } = {}) {
       const img = new Image();
       img.onload = () => resolve(img);
       img.onerror = () => reject(new Error(`Falha ao carregar ${profile.image}`));
-      img.src = `${profile.image}?v=v19`;
+      img.src = `${profile.image}?v=v16`;
     }),
   ]);
 
@@ -775,6 +785,7 @@ async function init() {
   paNegativeBtn.addEventListener('click', () => toggleSignedInput(paEl, 4));
   oatNegativeBtn.addEventListener('click', () => toggleSignedInput(oatEl, 2));
   runBtn.addEventListener('click', runCalculation);
+  if (demoBtn) demoBtn.addEventListener('click', loadDemo);
   resetBtn.addEventListener('click', resetForm);
   toggleChartBtn.addEventListener('click', () => toggleChartVisibility());
   exportPdfBtn.addEventListener('click', exportInterpolatedPdf);
