@@ -14,10 +14,43 @@
       <div>
         <p class="eyebrow">AW139 Companion App</p>
         <h1>RTO / CTO Module</h1>
-        <p id="subtitleEl" class="subtitle">Reject Take Off Distance — Supplement 50 — Figure 4-54</p>
-        <p id="buildVersionEl" class="build-version">Build v16 • Sup 50 standard + EAPS OFF + EAPS ON</p>
+        <p id="buildVersionEl" class="build-version">Build v19</p>
       </div>
     </header>
+
+    <section id="statusCard" class="card status result-card neutral">
+      <div class="result-header-row">
+        <div id="statusBadge" class="status-badge">AGUARDANDO DADOS</div>
+      </div>
+
+      <div class="result-focus">
+        <span class="label result-label">RTO final</span>
+        <strong id="finalMetric" class="result-big">—</strong>
+        <small id="finalMetricFt" class="result-big-sub">—</small>
+      </div>
+
+      <div class="status-summary">
+        <div class="status-copy">
+          <p class="label">Status</p>
+          <h2 id="statusTitle">RTO Figure 4-54</h2>
+          <p id="statusText">Preencha os campos e execute o cálculo.</p>
+        </div>
+
+        <div class="metrics metrics-secondary">
+          <div class="metric secondary-metric">
+            <span class="label">RTO base</span>
+            <strong id="baseMetric">—</strong>
+            <small id="baseMetricFt">—</small>
+          </div>
+          <div class="metric secondary-metric reference-metric">
+            <span class="label">Correção / kt</span>
+            <strong id="corrMetric">—</strong>
+            <small id="corrMetricFt">—</small>
+            <span class="metric-note">Referência</span>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <section class="card form-card">
       <div class="card-title-row">
@@ -77,50 +110,12 @@
         <button id="runBtn" class="primary">Calcular RTO</button>
         <button id="resetBtn" class="ghost">Reset</button>
       </div>
-      <div class="action-row action-row-secondary">
-        <button id="demoBtn" class="ghost small ghost-inline">Carregar demo</button>
-      </div>
       <p id="formHint" class="hint">Escopo atual: Supplement 50, RTO Clear Area. Selecione o perfil.</p>
     </section>
 
-    <section id="statusCard" class="card status neutral">
-      <div id="statusBadge" class="status-badge">AGUARDANDO DADOS</div>
-      <div class="status-main">
-        <div>
-          <p class="label">Status</p>
-          <h2 id="statusTitle">RTO Figure 4-54</h2>
-          <p id="statusText">Preencha os campos e execute o cálculo.</p>
-        </div>
-        <div class="metrics metrics-triple">
-          <div class="metric">
-            <span class="label">Base distance</span>
-            <strong id="baseMetric">—</strong>
-            <small id="baseMetricFt">—</small>
-          </div>
-          <div class="metric">
-            <span class="label">Correction / kt</span>
-            <strong id="corrMetric">—</strong>
-            <small id="corrMetricFt">—</small>
-          </div>
-          <div class="metric emphasis-metric">
-            <span class="label">RTO final</span>
-            <strong id="finalMetric">—</strong>
-            <small id="finalMetricFt">—</small>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="card compact">
+    <section class="card visual-card">
       <div class="card-title-row">
-        <h2>Interpolação aplicada</h2>
-      </div>
-      <div id="interpBox" class="interp-box muted">Sem cálculo ainda.</div>
-    </section>
-
-    <section class="card">
-      <div class="card-title-row">
-        <h2>Visual interpolation</h2>
+        <h2>Visualização</h2>
         <div class="toolbar-row">
           <button id="toggleChart" class="ghost small">Mostrar gráfico</button>
           <button id="exportPdfBtn" class="ghost small">Compartilhar / Baixar PDF</button>
@@ -134,14 +129,21 @@
           <span><i class="dot amber"></i> PA / curvas OAT usadas</span>
           <span><i class="dot cyan"></i> Transferência</span>
           <span><i class="dot green"></i> curvas de peso usadas</span>
-          <span><i class="dot magenta"></i> Correction / Reference line</span>
+          <span><i class="dot magenta"></i> Correção / linha de referência</span>
         </div>
         <p id="chartHint" class="hint">Overlay direto sobre a página completa do RFM: altitude, curvas usadas no cálculo, transferência horizontal, leitura da distância e correção por headwind.</p>
         <p id="chartReference" class="chart-reference"><strong>Gráfico em uso:</strong> Figure 4-54 — Rejected Take Off Distance OEI Clear Area.<br><strong>Suplemento:</strong> Supplement 50<br><strong>Página:</strong> S50-85<br><strong>Fonte:</strong> Leonardo AW139 Rotorcraft Flight Manual (RFM), Ed. 2, Rev. 32.</p>
       </div>
     </section>
+
+    <section class="card compact interp-card">
+      <div class="card-title-row">
+        <h2>Interpolação aplicada</h2>
+      </div>
+      <div id="interpBox" class="interp-box muted">Sem cálculo ainda.</div>
+    </section>
   </main>
 
-  <script src="app.js?v=rto-engine-v16"></script>
+  <script src="app.js?v=rto-engine-v19"></script>
 </body>
 </html>
