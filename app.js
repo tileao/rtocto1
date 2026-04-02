@@ -12,6 +12,12 @@ const toggleChartBtn = document.getElementById('toggleChart');
 const exportPdfBtn = document.getElementById('exportPdfBtn');
 const chartPanel = document.getElementById('chartPanel');
 const chartCanvas = document.getElementById('chartCanvas');
+const chartStage = document.getElementById('chartStage');
+const chartFullscreen = document.getElementById('chartFullscreen');
+const fullscreenChartCanvas = document.getElementById('fullscreenChartCanvas');
+const closeFullscreenBtn = document.getElementById('closeFullscreenBtn');
+const fullscreenViewport = document.getElementById('fullscreenViewport');
+const fullscreenContent = document.getElementById('fullscreenContent');
 const subtitleEl = document.getElementById('subtitleEl');
 const buildVersionEl = document.getElementById('buildVersionEl');
 
@@ -26,12 +32,30 @@ const interpBox = document.getElementById('interpBox');
 
 const BASE_PAGE_WIDTH = 842;
 const BASE_PAGE_HEIGHT = 595;
+const BUILD_LABEL = 'BUILD V39 • standard auto-switch 6800/7000 + unified Rev. 32 source';
 
 const state = {
   engine: null,
   image: null,
   currentResult: null,
   profileKey: 'standard',
+  activeProfileKey: 'standard',
+};
+
+const fullscreenState = {
+  zoom: 1,
+  minZoom: 1,
+  maxZoom: 6,
+  panX: 0,
+  panY: 0,
+  baseWidth: 0,
+  baseHeight: 0,
+  pointers: new Map(),
+  dragOriginX: 0,
+  dragOriginY: 0,
+  pinchStartDistance: 0,
+  pinchContentX: 0,
+  pinchContentY: 0,
 };
 
 const tabletLayoutQuery = window.matchMedia('(min-width: 768px) and (max-width: 1366px)');
@@ -40,6 +64,34 @@ function applyAdaptiveLayout() {
   const tabletDashboard = tabletLayoutQuery.matches;
   document.body.classList.toggle('tablet-dashboard', tabletDashboard);
   if (tabletDashboard) toggleChartVisibility(true);
+}
+
+function resolveEffectiveProfileKey(profileKey, weightKg = parseUnsignedField(weightEl)) {
+  if (profileKey === 'standard') {
+    if (Number.isFinite(weightKg) && weightKg > 6800) return 'standard7000';
+    return 'standard';
+  }
+  return profileKey;
+}
+
+function getSelectedConfigurationLabel() {
+  const selected = configurationEl?.selectedOptions?.[0]?.textContent?.trim();
+  return selected || profiles[state.profileKey]?.label || '—';
+}
+
+async function ensureEffectiveProfileLoaded({ preserveInputs = true, autoRun = false } = {}) {
+  const desiredProfileKey = resolveEffectiveProfileKey(state.profileKey, parseUnsignedField(weightEl));
+  if (state.engine && state.activeProfileKey === desiredProfileKey) return;
+  await loadProfile(state.profileKey, { preserveInputs, autoRun, effectiveWeightKg: parseUnsignedField(weightEl) });
+}
+
+async function refreshStandardProfileIfNeeded() {
+  if (state.profileKey !== 'standard') return;
+  const digits = digitsOnlyLength(weightEl);
+  if (digits < 4) return;
+  const desiredProfileKey = resolveEffectiveProfileKey('standard', parseUnsignedField(weightEl));
+  if (state.activeProfileKey === desiredProfileKey) return;
+  await loadProfile('standard', { preserveInputs: true, autoRun: false, effectiveWeightKg: parseUnsignedField(weightEl) });
 }
 
 const profiles = {
@@ -62,6 +114,11 @@ const profiles = {
     label: 'IBF Installed',
     json: 'data/figure_4_68a_engine_data.json',
     image: 'docs/page_s50_108a_figure_4_68a.png',
+  },
+  standard7000: {
+    label: '7000 Standard',
+    json: 'data/figure_4_92_engine_data.json',
+    image: 'docs/page_s90_123_figure_4_92.png',
   },
 };
 
@@ -474,6 +531,82 @@ function drawOverlayToCanvas(canvas, result = null) {
 
 function drawOverlay(result = null) {
   drawOverlayToCanvas(chartCanvas, result);
+  if (!chartFullscreen.classList.contains('hidden')) drawOverlayToCanvas(fullscreenChartCanvas, result);
+}
+
+function resetFullscreenView() {
+  fullscreenState.zoom = 1;
+  fullscreenState.panX = 0;
+  fullscreenState.panY = 0;
+  fullscreenState.pointers.clear();
+  fullscreenViewport?.classList.remove('is-dragging');
+}
+
+function getFullscreenViewportCenter() {
+  const rect = fullscreenViewport.getBoundingClientRect();
+  return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2, width: rect.width, height: rect.height };
+}
+
+function clampFullscreenPan() {
+  const { width, height } = getFullscreenViewportCenter();
+  const scaledWidth = fullscreenState.baseWidth * fullscreenState.zoom;
+  const scaledHeight = fullscreenState.baseHeight * fullscreenState.zoom;
+  const maxPanX = Math.max(0, (scaledWidth - width) / 2);
+  const maxPanY = Math.max(0, (scaledHeight - height) / 2);
+  fullscreenState.panX = Math.min(maxPanX, Math.max(-maxPanX, fullscreenState.panX));
+  fullscreenState.panY = Math.min(maxPanY, Math.max(-maxPanY, fullscreenState.panY));
+  if (fullscreenState.zoom <= fullscreenState.minZoom + 0.001) {
+    fullscreenState.panX = 0;
+    fullscreenState.panY = 0;
+  }
+}
+
+function applyFullscreenTransform() {
+  if (!fullscreenContent) return;
+  clampFullscreenPan();
+  fullscreenContent.style.transform = `translate(-50%, -50%) translate(${fullscreenState.panX}px, ${fullscreenState.panY}px) scale(${fullscreenState.zoom})`;
+}
+
+function layoutFullscreenCanvas(preserveView = false) {
+  if (!fullscreenViewport || chartFullscreen.classList.contains('hidden')) return;
+  const rect = fullscreenViewport.getBoundingClientRect();
+  if (!rect.width || !rect.height) return;
+  const fitScale = Math.min(rect.width / fullscreenChartCanvas.width, rect.height / fullscreenChartCanvas.height);
+  fullscreenState.baseWidth = fullscreenChartCanvas.width * fitScale;
+  fullscreenState.baseHeight = fullscreenChartCanvas.height * fitScale;
+  fullscreenContent.style.width = `${fullscreenState.baseWidth}px`;
+  fullscreenContent.style.height = `${fullscreenState.baseHeight}px`;
+  fullscreenChartCanvas.style.width = `${fullscreenState.baseWidth}px`;
+  fullscreenChartCanvas.style.height = `${fullscreenState.baseHeight}px`;
+  if (!preserveView) resetFullscreenView();
+  applyFullscreenTransform();
+}
+
+function zoomFullscreenAt(clientX, clientY, zoomFactor) {
+  const nextZoom = Math.min(fullscreenState.maxZoom, Math.max(fullscreenState.minZoom, fullscreenState.zoom * zoomFactor));
+  const { x: centerX, y: centerY } = getFullscreenViewportCenter();
+  const contentX = (clientX - centerX - fullscreenState.panX) / fullscreenState.zoom;
+  const contentY = (clientY - centerY - fullscreenState.panY) / fullscreenState.zoom;
+  fullscreenState.zoom = nextZoom;
+  fullscreenState.panX = clientX - centerX - (contentX * nextZoom);
+  fullscreenState.panY = clientY - centerY - (contentY * nextZoom);
+  applyFullscreenTransform();
+}
+
+function openFullscreenChart() {
+  if (chartPanel.classList.contains('hidden')) return;
+  chartFullscreen.classList.remove('hidden');
+  chartFullscreen.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('fullscreen-open');
+  drawOverlayToCanvas(fullscreenChartCanvas, state.currentResult);
+  requestAnimationFrame(() => layoutFullscreenCanvas(false));
+}
+
+function closeFullscreenChart() {
+  chartFullscreen.classList.add('hidden');
+  chartFullscreen.setAttribute('aria-hidden', 'true');
+  document.body.classList.remove('fullscreen-open');
+  resetFullscreenView();
 }
 
 function renderCompositeCanvas(result = state.currentResult) {
@@ -521,7 +654,8 @@ function renderCompositeCanvas(result = state.currentResult) {
 
   ctx.font = `${Math.round(14 * s)}px Inter, Arial, sans-serif`;
   ctx.fillStyle = '#455468';
-  ctx.fillText('Fonte: Leonardo AW139 Rotorcraft Flight Manual (RFM), Ed. 2, Rev. 32.', 28 * s, out.height - 24 * s);
+  const sourceText = src.rfm_source || 'Leonardo AW139 Rotorcraft Flight Manual (RFM)';
+  ctx.fillText(`Fonte: ${sourceText}.`, 28 * s, out.height - 24 * s);
   return out;
 }
 
@@ -664,7 +798,17 @@ function showError(message, kind = 'warn') {
   }
 }
 
-function runCalculation() {
+async function runCalculation({ skipEnsureProfile = false } = {}) {
+  if (!skipEnsureProfile) {
+    try {
+      await ensureEffectiveProfileLoaded({ preserveInputs: true, autoRun: false });
+    } catch (error) {
+      state.currentResult = null;
+      drawOverlay(null);
+      showError(`Falha ao carregar o perfil: ${error.message}`, 'err');
+      return;
+    }
+  }
   if (!state.engine) return;
   const payload = {
     paFt: parseSignedField(paEl),
@@ -720,7 +864,7 @@ function resetForm() {
 
 function toggleChartVisibility(forceShow = null) {
   if (forceShow === true) chartPanel.classList.remove('hidden');
-  else if (forceShow === false) chartPanel.classList.add('hidden');
+  else if (forceShow === false) { chartPanel.classList.add('hidden'); closeFullscreenChart(); }
   else chartPanel.classList.toggle('hidden');
   toggleChartBtn.textContent = chartPanel.classList.contains('hidden') ? 'Mostrar gráfico' : 'Ocultar gráfico';
   if (!chartPanel.classList.contains('hidden')) drawOverlay(state.currentResult);
@@ -731,19 +875,23 @@ function updateProfileTexts() {
   const src = state.engine?.source;
   if (!src) return;
   if (subtitleEl) subtitleEl.textContent = `Reject Take Off Distance — Supplement ${src.supplement} — Figure ${src.figure}`;
-  if (buildVersionEl) buildVersionEl.textContent = 'Build v24 • tablet layout optimized';
+  if (buildVersionEl) buildVersionEl.textContent = BUILD_LABEL;
   const paRange = state.engine.panels.left.pressure_altitude_ft;
-  const confLabel = src.configuration || profiles[state.profileKey]?.label || '—';
+  const confLabel = getSelectedConfigurationLabel();
+  const autoRule = state.profileKey === 'standard'
+    ? ' Padrão Standard: até 6800 kg usa Supplement 50; acima de 6800 kg usa Supplement 90.'
+    : '';
   const formHint = document.getElementById('formHint');
   if (formHint) {
-    formHint.textContent = `Escopo atual: Supplement ${src.supplement}, Figure ${src.figure}, ${confLabel}. Faixa de PA = ${fmt(paRange.min, 0)} a ${fmt(paRange.max, 0)} ft.`;
+    formHint.textContent = `Escopo atual: Supplement ${src.supplement}, Figure ${src.figure}, ${confLabel}. Faixa de PA = ${fmt(paRange.min, 0)} a ${fmt(paRange.max, 0)} ft.${autoRule}`;
   }
   chartReference.innerHTML = `<strong>Gráfico em uso:</strong> Figure ${src.figure} — ${src.title}.<br><strong>Suplemento:</strong> Supplement ${src.supplement}<br><strong>Página:</strong> ${src.page}<br><strong>Fonte:</strong> ${src.rfm_source}.`;
 }
 
-async function loadProfile(profileKey, { preserveInputs = true } = {}) {
-  const profile = profiles[profileKey];
-  if (!profile) throw new Error(`Perfil não suportado: ${profileKey}`);
+async function loadProfile(profileKey, { preserveInputs = true, autoRun = true, effectiveWeightKg = null } = {}) {
+  const effectiveProfileKey = resolveEffectiveProfileKey(profileKey, effectiveWeightKg ?? parseUnsignedField(weightEl));
+  const profile = profiles[effectiveProfileKey];
+  if (!profile) throw new Error(`Perfil não suportado: ${effectiveProfileKey}`);
 
   const snapshot = preserveInputs ? {
     pa: paEl.value,
@@ -753,8 +901,9 @@ async function loadProfile(profileKey, { preserveInputs = true } = {}) {
   } : null;
 
   state.profileKey = profileKey;
+  state.activeProfileKey = effectiveProfileKey;
   const [engine, image] = await Promise.all([
-    fetch(`${profile.json}?v=v25`).then((r) => {
+    fetch(`${profile.json}?v=v39`).then((r) => {
       if (!r.ok) throw new Error(`Falha ao carregar ${profile.json}`);
       return r.json();
     }),
@@ -762,7 +911,7 @@ async function loadProfile(profileKey, { preserveInputs = true } = {}) {
       const img = new Image();
       img.onload = () => resolve(img);
       img.onerror = () => reject(new Error(`Falha ao carregar ${profile.image}`));
-      img.src = `${profile.image}?v=v25`;
+      img.src = `${profile.image}?v=v39`;
     }),
   ]);
 
@@ -779,8 +928,8 @@ async function loadProfile(profileKey, { preserveInputs = true } = {}) {
       String(paEl.value).trim() !== '' &&
       String(oatEl.value).trim() !== '' &&
       String(weightEl.value).trim() !== '';
-    if (enoughToRun) {
-      runCalculation();
+    if (enoughToRun && autoRun) {
+      runCalculation({ skipEnsureProfile: true });
       return;
     }
   }
@@ -801,6 +950,92 @@ async function init() {
   resetBtn.addEventListener('click', resetForm);
   toggleChartBtn.addEventListener('click', () => toggleChartVisibility());
   exportPdfBtn.addEventListener('click', exportInterpolatedPdf);
+  chartStage.addEventListener('click', () => openFullscreenChart());
+  chartStage.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      openFullscreenChart();
+    }
+  });
+  closeFullscreenBtn.addEventListener('click', closeFullscreenChart);
+  fullscreenViewport.addEventListener('wheel', (event) => {
+    if (chartFullscreen.classList.contains('hidden')) return;
+    event.preventDefault();
+    zoomFullscreenAt(event.clientX, event.clientY, event.deltaY < 0 ? 1.12 : 1 / 1.12);
+  }, { passive: false });
+  fullscreenViewport.addEventListener('dblclick', (event) => {
+    event.preventDefault();
+    if (fullscreenState.zoom > 1.05) {
+      resetFullscreenView();
+      applyFullscreenTransform();
+    } else {
+      zoomFullscreenAt(event.clientX, event.clientY, 2);
+    }
+  });
+  fullscreenViewport.addEventListener('pointerdown', (event) => {
+    if (chartFullscreen.classList.contains('hidden')) return;
+    fullscreenViewport.setPointerCapture(event.pointerId);
+    fullscreenState.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    if (fullscreenState.pointers.size === 1) {
+      fullscreenState.dragOriginX = event.clientX - fullscreenState.panX;
+      fullscreenState.dragOriginY = event.clientY - fullscreenState.panY;
+      if (fullscreenState.zoom > 1.001) fullscreenViewport.classList.add('is-dragging');
+    } else if (fullscreenState.pointers.size === 2) {
+      const [a, b] = [...fullscreenState.pointers.values()];
+      const center = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+      const { x: viewportCenterX, y: viewportCenterY } = getFullscreenViewportCenter();
+      fullscreenState.pinchStartDistance = Math.max(1, Math.hypot(a.x - b.x, a.y - b.y));
+      fullscreenState.pinchContentX = (center.x - viewportCenterX - fullscreenState.panX) / fullscreenState.zoom;
+      fullscreenState.pinchContentY = (center.y - viewportCenterY - fullscreenState.panY) / fullscreenState.zoom;
+      fullscreenViewport.classList.remove('is-dragging');
+    }
+  });
+  fullscreenViewport.addEventListener('pointermove', (event) => {
+    if (!fullscreenState.pointers.has(event.pointerId)) return;
+    fullscreenState.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    if (fullscreenState.pointers.size === 1) {
+      if (fullscreenState.zoom <= 1.001) return;
+      fullscreenState.panX = event.clientX - fullscreenState.dragOriginX;
+      fullscreenState.panY = event.clientY - fullscreenState.dragOriginY;
+      fullscreenViewport.classList.add('is-dragging');
+      applyFullscreenTransform();
+    } else if (fullscreenState.pointers.size === 2) {
+      const [a, b] = [...fullscreenState.pointers.values()];
+      const center = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+      const distance = Math.max(1, Math.hypot(a.x - b.x, a.y - b.y));
+      const nextZoom = Math.min(fullscreenState.maxZoom, Math.max(fullscreenState.minZoom, fullscreenState.zoom * (distance / fullscreenState.pinchStartDistance)));
+      const { x: viewportCenterX, y: viewportCenterY } = getFullscreenViewportCenter();
+      fullscreenState.zoom = nextZoom;
+      fullscreenState.panX = center.x - viewportCenterX - (fullscreenState.pinchContentX * nextZoom);
+      fullscreenState.panY = center.y - viewportCenterY - (fullscreenState.pinchContentY * nextZoom);
+      fullscreenState.pinchStartDistance = distance;
+      const localX = (center.x - viewportCenterX - fullscreenState.panX) / fullscreenState.zoom;
+      const localY = (center.y - viewportCenterY - fullscreenState.panY) / fullscreenState.zoom;
+      fullscreenState.pinchContentX = localX;
+      fullscreenState.pinchContentY = localY;
+      applyFullscreenTransform();
+    }
+  });
+  function handleFullscreenPointerEnd(event) {
+    fullscreenState.pointers.delete(event.pointerId);
+    if (fullscreenState.pointers.size === 1) {
+      const remaining = [...fullscreenState.pointers.values()][0];
+      fullscreenState.dragOriginX = remaining.x - fullscreenState.panX;
+      fullscreenState.dragOriginY = remaining.y - fullscreenState.panY;
+      if (fullscreenState.zoom > 1.001) fullscreenViewport.classList.add('is-dragging');
+    } else {
+      fullscreenViewport.classList.remove('is-dragging');
+    }
+  }
+  fullscreenViewport.addEventListener('pointerup', handleFullscreenPointerEnd);
+  fullscreenViewport.addEventListener('pointercancel', handleFullscreenPointerEnd);
+  fullscreenViewport.addEventListener('pointerleave', handleFullscreenPointerEnd);
+  window.addEventListener('resize', () => {
+    if (!chartFullscreen.classList.contains('hidden')) layoutFullscreenCanvas(true);
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && !chartFullscreen.classList.contains('hidden')) closeFullscreenChart();
+  });
   configurationEl.addEventListener('change', async () => {
     try {
       await loadProfile(configurationEl.value);
@@ -816,6 +1051,13 @@ async function init() {
         runCalculation();
       }
     });
+  });
+
+  weightEl.addEventListener('input', () => {
+    refreshStandardProfileIfNeeded().catch(() => {});
+  });
+  weightEl.addEventListener('blur', () => {
+    refreshStandardProfileIfNeeded().catch(() => {});
   });
 
   if ('serviceWorker' in navigator) {
