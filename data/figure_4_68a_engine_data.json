@@ -7,7 +7,7 @@
     "title": "Rejected Take Off Distance OEI Clear Area, IBF Installed",
     "metric": "RTO",
     "configuration": "IBF Installed / Clear Area",
-    "rfm_source": "Leonardo AW139 Rotorcraft Flight Manual (RFM), 4D Supplement 50, Rev. 31"
+    "rfm_source": "Leonardo AW139 Rotorcraft Flight Manual (RFM), Ed. 2, Rev. 32"
   },
   "status": {
     "version": "v01-engine-alpha",

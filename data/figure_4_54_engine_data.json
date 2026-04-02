@@ -11,12 +11,12 @@
   },
   "status": {
     "version": "v05-engine-alpha",
-    "scope": "Supplement 50 \u2022 Figure 4-54 only",
+    "scope": "Supplement 50 • Figure 4-54 only",
     "calculation": true,
     "interpolation": true,
     "notes": [
       "Engine derived from vector-first extraction of Figure 4-54.",
-      "Left-panel max OAT line uses the two exact vector strokes that form the 50\u00b0C / MAX OAT LIMIT trace.",
+      "Left-panel max OAT line uses the two exact vector strokes that form the 50°C / MAX OAT LIMIT trace.",
       "Center and right panels use exact vector strokes from the PDF content stream."
     ]
   },
